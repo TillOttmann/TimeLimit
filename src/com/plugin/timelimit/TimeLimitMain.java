@@ -1,5 +1,6 @@
 package com.plugin.timelimit;
 
+import java.io.File;
 import java.sql.Connection;
 
 import org.bukkit.Bukkit;
@@ -15,21 +16,37 @@ public class TimeLimitMain extends JavaPlugin {
 	@Override
 	public void onEnable() {
 		instance = this;
-		// Default config.yml wird erstellt falls nicht vorhanden
-		instance.saveDefaultConfig();
-		// DatabaseConnection-Object, wird gespeichert um später die Datenbankverbindung bei onDisable()
-		// wieder zu schließen. Die eigentliche Verbindung wird in conn gespeichert
-		DBInstance = new DatabaseConnection();
-		conn = DBInstance.getDatabaseConnection();
 		
-		getServer().getPluginManager().registerEvents(new PlayerListener(), instance);
-		new CommandManager();
+		if (configFileExists()) {
+			sendConsoleMessage("default", "config.yml vorhanden");
+			// DatabaseConnection-Object, wird gespeichert um später die Datenbankverbindung bei onDisable()
+			// wieder zu schließen. Die eigentliche Verbindung wird in conn gespeichert
+			DBInstance = new DatabaseConnection();
+			conn = DBInstance.getDatabaseConnection();
+			
+			if (conn == null) {
+				sendConsoleMessage("error", "Datenbankverbindung konnte nicht aufgebaut werden");
+				instance.getServer().getPluginManager().disablePlugin(instance);
+			} else {
+				getServer().getPluginManager().registerEvents(new PlayerListener(), instance);
+				new CommandManager();
+			}
+		} else {
+			sendConsoleMessage("warning", "config.yml existiert nicht, wird erstellt");
+			// Default config.yml wird erstellt falls nicht vorhanden
+			instance.saveDefaultConfig();
+			sendConsoleMessage("warning", "Bitte die Datenbank in der config.yml angeben, sonst kann das Plugin nicht funktionieren!");
+			instance.getServer().getPluginManager().disablePlugin(instance);
+		}
 	}
 
 	// Wird aufgerufen, wenn das Plugin deaktiviert wird
 	@Override
 	public void onDisable() {
-		DBInstance.closeDatabaseConnection();
+		if (DBInstance != null) {
+			DBInstance.closeDatabaseConnection();
+		}
+		sendConsoleMessage("default", "Plugin wird deaktiviert");
 	}
 	
 	// Instance-Getter (Einzige derzeitige verwendung: Async-Runnables in CommandManager)
@@ -66,4 +83,9 @@ public class TimeLimitMain extends JavaPlugin {
 		}
 		Bukkit.getServer().getConsoleSender().sendMessage(color + "[TimeLimit] " + message);
 	}
+	
+    private boolean configFileExists() {
+        File configFile = new File(getDataFolder(), "config.yml");
+        return configFile.exists();
+    }
 }
