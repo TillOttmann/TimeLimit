@@ -1,0 +1,18 @@
+name: TimeLimit
+main: com.plugin.timelimit.TimeLimitMain
+version: 0.1
+api-version: 1.21
+commands:
+   timelimit:
+       description: Verwalte die Zeitlimits von Spielern
+       usage: /timelimit <set/get/enable/disable/show/hide> <player> <value>
+permissions:
+    timelimit.get:
+        description: Erlaubt das abrufen von Zeitlimits
+        default: op
+    timelimit.set:
+        description: Erlaubt das festlegen von Zeitlimits
+        default: op
+    timelimit.status:
+        description: Erlaubt das (De)Aktiveren von Zeitlimits
+        default: op

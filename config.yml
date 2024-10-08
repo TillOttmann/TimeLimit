@@ -1,0 +1,3 @@
+DB_Url: 'localhost:3306'
+DB_User: 'root'
+DB_Pw: 'root123'
