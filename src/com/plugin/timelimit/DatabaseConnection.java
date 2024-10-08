@@ -132,14 +132,16 @@ class DatabaseConnection {
 	// Schliesst die Datenbankverbindung, wird durch onDisable() in TimeLimitMain
 	// aufgerufen
 	protected void closeDatabaseConnection() {
+		
+		if (connection != null) {
+			try {
+				connection.close();
+				TimeLimitMain.sendConsoleMessage("default", "Datenbankverbindung erfolgreich geschlossen");
 
-		try {
-			connection.close();
-			TimeLimitMain.sendConsoleMessage("default", "Datenbankverbindung erfolgreich geschlossen");
+			} catch (SQLException e) {
+				e.printStackTrace();
 
-		} catch (SQLException e) {
-			e.printStackTrace();
-
+			}
 		}
 	}
 }
