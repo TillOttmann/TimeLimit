@@ -11,7 +11,7 @@ This Spigot plugin allows the management of players playtime (screentime). It wa
 - Toggleable scoreboard with information on playtime and playtime left
 - Warnings when playtime is about to run out
 - Kicking players when playtime has run out
-- 
+
 ## Installation
 
 1) Download the latest release (.jar) from [releases](https://github.com/TillOttmann/TimeLimit/releases)
