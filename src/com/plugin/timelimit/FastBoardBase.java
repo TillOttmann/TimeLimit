@@ -373,7 +373,8 @@ public abstract class FastBoardBase<T> {
      * @throws IllegalArgumentException if one line is longer than 30 chars on 1.12 or lower
      * @throws IllegalStateException    if {@link #delete()} was call before
      */
-    public void updateLines(T... lines) {
+    @SuppressWarnings("unchecked")
+	public void updateLines(T... lines) {
         updateLines(Arrays.asList(lines));
     }
 
@@ -489,7 +490,8 @@ public abstract class FastBoardBase<T> {
      * @throws IllegalArgumentException if the size of the texts does not match the current size of the board
      * @throws IllegalStateException    if {@link #delete()} was call before
      */
-    public synchronized void updateScores(T... texts) {
+    @SuppressWarnings("unchecked")
+	public synchronized void updateScores(T... texts) {
         updateScores(Arrays.asList(texts));
     }
 
