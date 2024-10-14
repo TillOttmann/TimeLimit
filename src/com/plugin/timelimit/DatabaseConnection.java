@@ -62,7 +62,7 @@ class DatabaseConnection {
 			// Die Spalte 'status' gibt an, ob das limit aktiviert oder deaktiviert ist (1 =
 			// aktiv, 0 = nicht aktiv)
 			String createPresetDataTable = "CREATE TABLE IF NOT EXISTS presetData "
-				+ "(id INT AUTO_INCREMENT PRIMARY KEY, grade TINYINT UNIQUE, timeLimit SMALLINT DEFAULT 0, status BOOLEAN DEFAULT 0)";
+				+ "(id INT AUTO_INCREMENT PRIMARY KEY, grade TINYINT UNIQUE, timelimit SMALLINT DEFAULT 0, status BOOLEAN DEFAULT 0)";
 			stmt.executeUpdate(createPresetDataTable);
 
 			if (stmt.getWarnings() != null) {
@@ -95,7 +95,7 @@ class DatabaseConnection {
 			// Die Spalte 'modified' speichert ausserdem, ob der Spieler ein individuelles
 			// Zeitlimit erhalten hat
 			String createPlayerDataTable = "CREATE TABLE IF NOT EXISTS playerData "
-				+ "(id INT AUTO_INCREMENT PRIMARY KEY, username VARCHAR(16), grade TINYINT, timeLimit SMALLINT DEFAULT 0, status BOOLEAN DEFAULT 0, modified BOOLEAN DEFAULT 0)";
+				+ "(id INT AUTO_INCREMENT PRIMARY KEY, username VARCHAR(16), grade TINYINT, timelimit SMALLINT DEFAULT 0, status BOOLEAN DEFAULT 0, modified BOOLEAN DEFAULT 0)";
 			stmt.executeUpdate(createPlayerDataTable);
 
 			if (stmt.getWarnings() != null) {
@@ -106,8 +106,8 @@ class DatabaseConnection {
 			}
 			
 			// Fügt Zeitlimit-Presets in die Tabelle ein, falls diese nicht existieren
-			String insertNewPresets = "INSERT INTO presetData (grade, timeLimit, status) " + "SELECT * FROM ( "
-				+ "SELECT 0 AS grade, 120 AS timeLimit, 1 AS status UNION ALL " + "SELECT 5, 60, 1 UNION ALL "
+			String insertNewPresets = "INSERT INTO presetData (grade, timelimit, status) " + "SELECT * FROM ( "
+				+ "SELECT 0 AS grade, 120 AS timelimit, 1 AS status UNION ALL " + "SELECT 5, 60, 1 UNION ALL "
 				+ "SELECT 6, 60, 1 UNION ALL " + "SELECT 7, 60, 1 UNION ALL " + "SELECT 8, 60, 1 UNION ALL "
 				+ "SELECT 9, 60, 1 UNION ALL " + "SELECT 10, 60, 1 UNION ALL " + "SELECT 11, 60, 1 UNION ALL "
 				+ "SELECT 12, 60, 1 UNION ALL " + "SELECT 13, 60, 1 " + ") AS NewGrades " + "WHERE NOT EXISTS ( " + "SELECT 1 "

@@ -55,14 +55,14 @@ class PlayerManager {
 	private void getPlayerData() {
 		
 		// Holt sich folgende Spielerdaten aus der Datenbank
-		// playerData: grade, timeLimit, status, modified
+		// playerData: grade, timelimit, status, modified
 		// playTimeData: playTime (des derzeitigen Datums)
 		// Falls die benötigten Einträge nicht existieren, werden sie hinzugefügt
 		try {
 			PreparedStatement preparedStmt;
 
-			String insertPlayerDataIfNotExists = "INSERT INTO playerData (username, grade, timeLimit, status, modified) "
-				+ "SELECT ?, ?, " + "(SELECT timeLimit FROM presetData WHERE grade = ?), "
+			String insertPlayerDataIfNotExists = "INSERT INTO playerData (username, grade, timelimit, status, modified) "
+				+ "SELECT ?, ?, " + "(SELECT timelimit FROM presetData WHERE grade = ?), "
 				+ "(SELECT status FROM presetData WHERE grade = ?), " + "0 "
 				+ "WHERE NOT EXISTS (SELECT 1 FROM playerData WHERE username = ?)";
 
@@ -82,7 +82,7 @@ class PlayerManager {
 			preparedStmt.setString(2, name);
 			preparedStmt.execute();
 
-			String getPlayerData = "SELECT pd.grade, pd.timeLimit, pd.status, pd.modified, "
+			String getPlayerData = "SELECT pd.grade, pd.timelimit, pd.status, pd.modified, "
 				+ "(SELECT playTime FROM playTimeData WHERE username = ? AND date = CURDATE()) AS playTime " + "FROM playerData pd "
 				+ "WHERE pd.username = ?";
 
@@ -102,8 +102,8 @@ class PlayerManager {
 							+ name + "' in playTimeData (für den heutigen Tag) bzw playerData gefunden, bitte überprüfen!");
 					
 				} else if (gradeTemp != grade && modifiedTemp == 0) {
-					String updateGradeAndLimitPreset = "UPDATE playerData SET timeLimit = "
-						+ "(SELECT timeLimit FROM presetData WHERE grade = ?), " + "grade = ? WHERE username = ?";
+					String updateGradeAndLimitPreset = "UPDATE playerData SET timelimit = "
+						+ "(SELECT timelimit FROM presetData WHERE grade = ?), " + "grade = ? WHERE username = ?";
 
 					preparedStmt = conn.prepareStatement(updateGradeAndLimitPreset);
 					preparedStmt.setInt(1, grade);
@@ -113,7 +113,7 @@ class PlayerManager {
 
 				}
 				
-				timeLimit = result.getInt("timeLimit");
+				timeLimit = result.getInt("timelimit");
 				status = result.getBoolean("status");
 				playTime = result.getInt("playTime");
 

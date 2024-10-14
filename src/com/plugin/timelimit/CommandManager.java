@@ -151,7 +151,7 @@ class CommandManager implements CommandExecutor, TabCompleter {
 		try {
 			PreparedStatement preparedStmt;
 			
-			String updateTimeLimit = "UPDATE playerData SET timeLimit = ?, modified = 1 WHERE username = ?";
+			String updateTimeLimit = "UPDATE playerData SET timelimit = ?, modified = 1 WHERE username = ?";
 			
 			preparedStmt = conn.prepareStatement(updateTimeLimit);
 			preparedStmt.setInt(1, timeLimit);
@@ -169,7 +169,7 @@ class CommandManager implements CommandExecutor, TabCompleter {
 				if (affectedRows == 0) {
 
 					String insertMissingPlayerData = "INSERT INTO playerData "
-							+ "(username, grade, timeLimit, status, modified) "
+							+ "(username, grade, timelimit, status, modified) "
 							+ "VALUES (?, 0, ?, 1, 1)";
 					
 					preparedStmt = conn.prepareStatement(insertMissingPlayerData);
@@ -203,7 +203,7 @@ class CommandManager implements CommandExecutor, TabCompleter {
 		try {
 			PreparedStatement preparedStmt;
 			
-			String getTimeLimit = "SELECT timeLimit, status FROM playerData WHERE username = ?";
+			String getTimeLimit = "SELECT timelimit, status FROM playerData WHERE username = ?";
 			
 			preparedStmt = conn.prepareStatement(getTimeLimit);
 			preparedStmt.setString(1, target);
@@ -211,7 +211,7 @@ class CommandManager implements CommandExecutor, TabCompleter {
 			ResultSet result = preparedStmt.executeQuery();
 			
 			if (result.next()) {
-				int timeLimitTemp = result.getInt("timeLimit");
+				int timeLimitTemp = result.getInt("timelimit");
 				String statusString = (result.getBoolean("status")) ? "aktiviert" : "deaktiviert";
 				
 				if (!result.isLast()) {
@@ -253,7 +253,7 @@ class CommandManager implements CommandExecutor, TabCompleter {
 				if (affectedRows == 0) {
 
 					String insertMissingPlayerData = "INSERT INTO playerData "
-							+ "(username, grade, timeLimit, status, modified) "
+							+ "(username, grade, timelimit, status, modified) "
 							+ "VALUES (?, 0, 0, ?, 1)";
 					
 					preparedStmt = conn.prepareStatement(insertMissingPlayerData);
