@@ -62,7 +62,7 @@ class DatabaseConnection {
 			// Die Spalte 'status' gibt an, ob das limit aktiviert oder deaktiviert ist (1 =
 			// aktiv, 0 = nicht aktiv)
 			String createPresetDataTable = "CREATE TABLE IF NOT EXISTS presetData "
-				+ "(grade TINYINT UNIQUE, timeLimit SMALLINT DEFAULT 0, status BOOLEAN DEFAULT 0)";
+				+ "(id INT AUTO_INCREMENT PRIMARY KEY, grade TINYINT UNIQUE, timeLimit SMALLINT DEFAULT 0, status BOOLEAN DEFAULT 0)";
 			stmt.executeUpdate(createPresetDataTable);
 
 			if (stmt.getWarnings() != null) {
@@ -77,7 +77,8 @@ class DatabaseConnection {
 			// Erstellt die playTimeData Tabelle, hier wird die Spielzeit jedes Spielers in
 			// Abhängigkeit des Datums angegeben
 			String createPlayTimeDataTable = "CREATE TABLE IF NOT EXISTS playTimeData "
-				+ "(date DATETIME, username VARCHAR(16), playTime MEDIUMINT DEFAULT 0, UNIQUE KEY uniqueUsernameDate (date, username))";
+				+ "(id INT AUTO_INCREMENT PRIMARY KEY, date DATETIME, username VARCHAR(16), "
+				+ "playTime MEDIUMINT DEFAULT 0, UNIQUE KEY unique_username_date (username, date))";
 			stmt.executeUpdate(createPlayTimeDataTable);
 
 			if (stmt.getWarnings() != null) {
@@ -94,7 +95,7 @@ class DatabaseConnection {
 			// Die Spalte 'modified' speichert ausserdem, ob der Spieler ein individuelles
 			// Zeitlimit erhalten hat
 			String createPlayerDataTable = "CREATE TABLE IF NOT EXISTS playerData "
-				+ "(username VARCHAR(16), grade TINYINT, timeLimit SMALLINT DEFAULT 0, status BOOLEAN DEFAULT 0, modified BOOLEAN DEFAULT 0)";
+				+ "(id INT AUTO_INCREMENT PRIMARY KEY, username VARCHAR(16), grade TINYINT, timeLimit SMALLINT DEFAULT 0, status BOOLEAN DEFAULT 0, modified BOOLEAN DEFAULT 0)";
 			stmt.executeUpdate(createPlayerDataTable);
 
 			if (stmt.getWarnings() != null) {
