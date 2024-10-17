@@ -39,18 +39,28 @@ class PlayerListener implements Listener {
 	// (De)Aktiviert das TimeLimit-Scoreboard
 	// Das Scoreboard wird be deaktivierung gelöscht und der Bukkit-Runnable loop wird gestoppt,
 	// es wird nicht nur versteckt, wie der Befehl 'hide/show' zu vermuten lässt
-	static protected void changeScoreBoardStatus(Player player, boolean status) {
+	static void changeScoreBoardStatus(Player player, boolean status) {
 		playerBoards.get(player.getName()).changeSBStatus(status);
 		
 	}
 	
 	// Spielzeit-Getter, wird durch updateScoreboard() in TimeLimitScoreBoard aufgerufen
-	static protected int getPlayTime(Player player) {
+	static int getPlayTime(Player player) {
 		return playerManagers.get(player.getName()).getPlayTime();
 	}
 	
 	// Zeitlimit-Getter, wird durch den Constructor von TimeLimitScoreBoard aufgerufen
-	static protected int getTimeLimit(Player player) {
+	static int getTimeLimit(Player player) {
 		return playerManagers.get(player.getName()).getTimeLimit();
+	}
+	
+	static void restartPlayer(Player player) {
+		playerBoards.get(player.getName()).disableBoard();
+		playerManagers.get(player.getName()).disconnectEvent();
+		playerManagers.remove(player.getName());
+		playerBoards.remove(player.getName());
+		
+		playerManagers.putIfAbsent(player.getName(), new PlayerManager(player));
+		playerBoards.putIfAbsent(player.getName(), new TimeLimitScoreBoard(player));
 	}
 }

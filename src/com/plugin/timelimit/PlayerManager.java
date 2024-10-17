@@ -5,6 +5,8 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
+import javax.print.attribute.PrintJobAttribute;
+
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
 
@@ -18,10 +20,10 @@ class PlayerManager {
 	
 	private Connection conn;
 	private Player player;
-	private String name;
+	private String uuid;
 	private int grade;
 	private int timeLimit;
-	private int playTime;
+	private int playTime = 0;
 	private boolean status;
 	protected boolean online;
 	// Alle PermissionGroups der Stufenzuweisung
@@ -34,13 +36,13 @@ class PlayerManager {
 		conn = TimeLimitMain.getDatabaseConnection();
 		online = true;
 		this.player = player;
-		name = this.player.getName();
+		uuid = this.player.getUniqueId().toString();
 		// Holt sich die Stufe des Spielers mithilfe der Permissiongroups
 		grade = findGrade(this.player);
 
 		// Holt sich die Spielerdaten aus der Datenbank
-		getPlayerData();
-		timeLimitCheckerLoop();
+		getPlayTimeData();
+		if (getPlayerData()) timeLimitCheckerLoop();
 	}
 	
 	// Playtime und TimeLimit getter für das Scoreboard
@@ -52,78 +54,61 @@ class PlayerManager {
 		return ((status) ? timeLimit : -1);
 	}
 	
-	private void getPlayerData() {
-		
-		// Holt sich folgende Spielerdaten aus der Datenbank
-		// playerData: grade, timelimit, status, modified
-		// playTimeData: playTime (des derzeitigen Datums)
-		// Falls die benötigten Einträge nicht existieren, werden sie hinzugefügt
+	private void getPlayTimeData() {
 		try {
 			PreparedStatement preparedStmt;
-
-			String insertPlayerDataIfNotExists = "INSERT INTO playerData (username, grade, timelimit, status, modified) "
-				+ "SELECT ?, ?, " + "(SELECT timelimit FROM presetData WHERE grade = ?), "
-				+ "(SELECT status FROM presetData WHERE grade = ?), " + "0 "
-				+ "WHERE NOT EXISTS (SELECT 1 FROM playerData WHERE username = ?)";
-
-			preparedStmt = conn.prepareStatement(insertPlayerDataIfNotExists);
-			preparedStmt.setString(1, name);
-			preparedStmt.setInt(2, grade);
-			preparedStmt.setInt(3, grade);
-			preparedStmt.setInt(4, grade);
-			preparedStmt.setString(5, name);
-			preparedStmt.execute();
-
-			String insertPlayTimeDataIfNotExists = "INSERT INTO playTimeData (date, username, playTime) " + "SELECT CURDATE(), ?, 0 "
-				+ "WHERE NOT EXISTS (SELECT 1 FROM playTimeData WHERE username = ? AND date = CURDATE())";
-
-			preparedStmt = conn.prepareStatement(insertPlayTimeDataIfNotExists);
-			preparedStmt.setString(1, name);
-			preparedStmt.setString(2, name);
-			preparedStmt.execute();
-
-			String getPlayerData = "SELECT pd.grade, pd.timelimit, pd.status, pd.modified, "
-				+ "(SELECT playTime FROM playTimeData WHERE username = ? AND date = CURDATE()) AS playTime " + "FROM playerData pd "
-				+ "WHERE pd.username = ?";
-
-			preparedStmt = conn.prepareStatement(getPlayerData);
-			preparedStmt.setString(1, name);
-			preparedStmt.setString(2, name);
-
-			ResultSet result = preparedStmt.executeQuery();
-
-			if (result.next()) {
-				
-				int gradeTemp = result.getInt("grade");
-				int modifiedTemp = result.getInt("modified");
-				
-				if (!result.isLast()) {
-					TimeLimitMain.sendConsoleMessage("error", "Mehr als ein Eintrag für '" 
-							+ name + "' in playTimeData (für den heutigen Tag) bzw playerData gefunden, bitte überprüfen!");
-					
-				} else if (gradeTemp != grade && modifiedTemp == 0) {
-					String updateGradeAndLimitPreset = "UPDATE playerData SET timelimit = "
-						+ "(SELECT timelimit FROM presetData WHERE grade = ?), " + "grade = ? WHERE username = ?";
-
-					preparedStmt = conn.prepareStatement(updateGradeAndLimitPreset);
-					preparedStmt.setInt(1, grade);
-					preparedStmt.setInt(2, grade);
-					preparedStmt.setString(3, name);
-					preparedStmt.execute();
-
-				}
-				
-				timeLimit = result.getInt("timelimit");
-				status = result.getBoolean("status");
-				playTime = result.getInt("playTime");
-
-			} else {
-				TimeLimitMain.sendConsoleMessage("error", "Daten von '" + name + "' konnten nicht abgerufen werden!");
+			
+			String getPlayTimeData = "SELECT playtime FROM playTimeData WHERE uuid = ?";
+			
+			preparedStmt = conn.prepareStatement(getPlayTimeData);
+			preparedStmt.setString(1, player.getUniqueId().toString());
+			
+			ResultSet playTimeRow = preparedStmt.executeQuery();
+			
+			if (playTimeRow.next()) {
+				playTime = playTimeRow.getInt("playtime");
 			}
-
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
+	}
+	private boolean getPlayerData() {
+		
+		// Holt sich folgende Spielerdaten aus der Datenbank
+		// playerData: grade, timelimit, status, modified
+		// Falls die benötigten Einträge nicht existieren, werden sie hinzugefügt
+		try {
+			PreparedStatement preparedStmt;
+			
+			String getPlayerDataRow = "SELECT * FROM playerData WHERE uuid = ?";
+			
+			preparedStmt = conn.prepareStatement(getPlayerDataRow);
+			preparedStmt.setString(1, player.getUniqueId().toString());
+			
+			ResultSet playerDataRow = preparedStmt.executeQuery();
+			
+			if (playerDataRow.next()) {
+				
+				int modified = playerDataRow.getInt("modified");
+				
+				timeLimit = playerDataRow.getInt("timelimit");
+				status = playerDataRow.getBoolean("status");
+				
+				// Checkt, ob mehr als eine Zeile vorhanden ist
+				if (modified == 1) {
+					return true;
+				} else if (!playerDataRow.isLast()) {
+					TimeLimitMain.sendConsoleMessage("error", "Mehr als ein Eintrag für '" + uuid + "' in playerData gefunden, bitte überprüfen!");
+					return false;	
+				}
+			}
+			insertMissingPlayerData();
+			return true;
+		} catch (SQLException e) {
+			e.printStackTrace();
+			
+		}
+		return false;
 	}
 	
 	// Speichert die Spielzeit in der DB und stoppt den Bukkit-Runnable loop
@@ -140,14 +125,33 @@ class PlayerManager {
 		try {
 			PreparedStatement preparedStmt;
 			
-			String savePlayTimeData = "INSERT INTO playTimeData (date, username, playTime)"
-				+ "VALUES (CURDATE(), ?, ?)"
-				+ "ON DUPLICATE KEY UPDATE"
-				+ "    playTime = VALUES(playTime)";
+			String savePlayTimeData = "REPLACE INTO playTimeData (date, uuid, playTime)"
+				+ "VALUES (CURDATE(), ?, ?)";
 			
 			preparedStmt = conn.prepareStatement(savePlayTimeData);
-			preparedStmt.setString(1, name);
+			preparedStmt.setString(1, uuid);
 			preparedStmt.setInt(2, playTime);
+			preparedStmt.execute();
+			
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+	}
+	
+	private void insertMissingPlayerData() {
+		try {
+			PreparedStatement preparedStmt;
+
+			String insertMissingData = "INSERT INTO playerData (uuid, grade, timelimit, status, modified)"
+					+ "VALUES (?, ?, "
+					+ "(SELECT timelimit FROM presetData WHERE grade = ?), "
+					+ "(SELECT status FROM presetData WHERE grade = ?), 1)";
+			
+			preparedStmt = conn.prepareStatement(insertMissingData);
+			preparedStmt.setString(1, uuid);
+			preparedStmt.setInt(2, grade);
+			preparedStmt.setInt(3, grade);
+			preparedStmt.setInt(4, grade);
 			preparedStmt.execute();
 			
 		} catch (SQLException e) {
@@ -178,10 +182,12 @@ class PlayerManager {
 						
 					}
 					
-					if (!((playTime / 60) < timeLimit) || !online) {
+					if (!((playTime / 60) < timeLimit)) {
 						player.kickPlayer("Deine Spielzeit von " + timeLimit + " Minuten ist abgelaufen");
 						this.cancel();
-
+					}
+					if (!online) {
+						this.cancel();
 					}
 				}
 				playTime += 5;

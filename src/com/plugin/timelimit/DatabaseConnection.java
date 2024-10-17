@@ -77,8 +77,8 @@ class DatabaseConnection {
 			// Erstellt die playTimeData Tabelle, hier wird die Spielzeit jedes Spielers in
 			// Abhängigkeit des Datums angegeben
 			String createPlayTimeDataTable = "CREATE TABLE IF NOT EXISTS playTimeData "
-				+ "(id INT AUTO_INCREMENT PRIMARY KEY, date DATETIME, username VARCHAR(16), "
-				+ "playTime MEDIUMINT DEFAULT 0, UNIQUE KEY unique_username_date (username, date))";
+				+ "(id INT AUTO_INCREMENT PRIMARY KEY, date DATETIME, UUID VARCHAR(36), "
+				+ "playtime MEDIUMINT DEFAULT 0, UNIQUE KEY unique_uuid_date (uuid, date))";
 			stmt.executeUpdate(createPlayTimeDataTable);
 
 			if (stmt.getWarnings() != null) {
@@ -95,7 +95,7 @@ class DatabaseConnection {
 			// Die Spalte 'modified' speichert ausserdem, ob der Spieler ein individuelles
 			// Zeitlimit erhalten hat
 			String createPlayerDataTable = "CREATE TABLE IF NOT EXISTS playerData "
-				+ "(id INT AUTO_INCREMENT PRIMARY KEY, username VARCHAR(16), grade TINYINT, timelimit SMALLINT DEFAULT 0, status BOOLEAN DEFAULT 0, modified BOOLEAN DEFAULT 0)";
+				+ "(uuid VARCHAR(36) PRIMARY KEY, grade TINYINT, timelimit SMALLINT DEFAULT 0, status BOOLEAN DEFAULT 0, modified BOOLEAN DEFAULT 0)";
 			stmt.executeUpdate(createPlayerDataTable);
 
 			if (stmt.getWarnings() != null) {

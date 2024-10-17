@@ -35,7 +35,7 @@ class TimeLimitScoreBoard {
 	// Erstellt das Board
 	private void enableBoard() {
 		board = new FastBoard(player);
-		board.updateTitle(ChatColor.GREEN + "Goetheschule Schulserver");
+		board.updateTitle(ChatColor.GREEN + "Spielzeit");
 		loop();
 	}
 	
@@ -61,12 +61,10 @@ class TimeLimitScoreBoard {
 	private void updateScoreBoard() {
 		playTime = PlayerListener.getPlayTime(player);
 		board.updateLines(
-				"",
-				"Spielzeit heute: " + playTime + " Minute(n)",
-				"",
-				"Spielzeit verbleibend: "
+				"Heute: " + playTime + " Min",
+				"Übrig: "
 				+ (((timeLimit - playTime) <= 5) ? ChatColor.RED : "")
-				+ ((timeLimit >= 0) ? (timeLimit - playTime) : "unendlich" )
-				+ " Minute(n)");
+				+ ((timeLimit >= 0) ? (timeLimit - playTime) : "∞" )
+				+ " Min");
 	}
 }
