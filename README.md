@@ -54,4 +54,5 @@ Show/hide the scoreboard
 
  - [Spigot API using BuildTools](https://www.spigotmc.org/wiki/buildtools/)
  - [FastBoard made by MRMicky-FR (Scoreboard API)](https://github.com/MrMicky-FR/FastBoard)
+ - [PlayerDB API for getting offline players uuid](https://playerdb.co/)
 
