@@ -1,6 +1,6 @@
 name: TimeLimit
 main: com.plugin.timelimit.TimeLimitMain
-version: 0.1
+version: 0.2
 api-version: 1.21
 commands:
    timelimit:
