@@ -54,13 +54,7 @@ class PlayerListener implements Listener {
 		return playerManagers.get(player.getName()).getTimeLimit();
 	}
 	
-	static void restartPlayer(Player player) {
-		playerBoards.get(player.getName()).disableBoard();
-		playerManagers.get(player.getName()).disconnectEvent();
-		playerManagers.remove(player.getName());
-		playerBoards.remove(player.getName());
-		
-		playerManagers.putIfAbsent(player.getName(), new PlayerManager(player));
-		playerBoards.putIfAbsent(player.getName(), new TimeLimitScoreBoard(player));
+	static void restartPlayerLoops(Player player, Integer timelimit, Boolean status) {
+		playerManagers.get(player.getName()).updateData(timelimit, status);
 	}
 }

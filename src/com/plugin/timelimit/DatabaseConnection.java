@@ -4,17 +4,23 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.bukkit.configuration.file.FileConfiguration;
 
 class DatabaseConnection {
-
+	
+	private List<Integer> presetLimits;
+	private List<Boolean> presetStates;
 	private Connection connection;
 
 	// Konstruktor, der die angegebenen Daten aus der config.yml benutzt, um die
 	// Datenbankverbindung aufzubauen
 	protected DatabaseConnection() {
-
+		
+		presetLimits = new ArrayList<Integer>();
+		presetStates = new ArrayList<Boolean>();
 		FileConfiguration config = TimeLimitMain.getFileConfig();
 
 		try {
@@ -24,12 +30,17 @@ class DatabaseConnection {
 			connection = DriverManager.getConnection(DBUrl, DBUser, DBPw);
 
 			TimeLimitMain.sendConsoleMessage("default", "Datenbankverbindung erfolgreich aufgebaut");
-			configureDatabase();
 
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
-
+		presetLimits.add(config.getInt("GRADE_" + 0 + "_LIMIT"));
+		presetStates.add(config.getBoolean("GRADE_" + 0 + "_STATE"));
+		for (int i = 5; i <= 13; i++) {
+			presetLimits.add(config.getInt("GRADE_" + i + "_LIMIT"));
+			presetStates.add(config.getBoolean("GRADE_" + i + "_STATE"));
+		}
+		configureDatabase();
 	}
 
 	// Gibt die Datenbankverbindung als Connection Objekt weiter
@@ -62,7 +73,7 @@ class DatabaseConnection {
 			// Die Spalte 'status' gibt an, ob das limit aktiviert oder deaktiviert ist (1 =
 			// aktiv, 0 = nicht aktiv)
 			String createPresetDataTable = "CREATE TABLE IF NOT EXISTS presetData "
-				+ "(id INT AUTO_INCREMENT PRIMARY KEY, grade TINYINT UNIQUE, timelimit SMALLINT DEFAULT 0, status BOOLEAN DEFAULT 0)";
+				+ "(grade TINYINT UNIQUE, timelimit SMALLINT DEFAULT 0, status BOOLEAN DEFAULT 0)";
 			stmt.executeUpdate(createPresetDataTable);
 
 			if (stmt.getWarnings() != null) {
@@ -106,20 +117,17 @@ class DatabaseConnection {
 			}
 			
 			// Fügt Zeitlimit-Presets in die Tabelle ein, falls diese nicht existieren
-			String insertNewPresets = "INSERT INTO presetData (grade, timelimit, status) " + "SELECT * FROM ( "
-				+ "SELECT 0 AS grade, 120 AS timelimit, 1 AS status UNION ALL " + "SELECT 5, 60, 1 UNION ALL "
-				+ "SELECT 6, 60, 1 UNION ALL " + "SELECT 7, 60, 1 UNION ALL " + "SELECT 8, 60, 1 UNION ALL "
-				+ "SELECT 9, 60, 1 UNION ALL " + "SELECT 10, 60, 1 UNION ALL " + "SELECT 11, 60, 1 UNION ALL "
-				+ "SELECT 12, 60, 1 UNION ALL " + "SELECT 13, 60, 1 " + ") AS NewGrades " + "WHERE NOT EXISTS ( " + "SELECT 1 "
-				+ "FROM presetData AS PD " + "WHERE PD.grade = NewGrades.grade " + ");";
-
-			int affectedRows = stmt.executeUpdate(insertNewPresets);
-
-			if (affectedRows == 0) {
-				TimeLimitMain.sendConsoleMessage("default", "Alle Limit-Presets vorhanden, Erstellung wird übersprungen");
+			String insertOrUpdatePresets = "REPLACE INTO presetData (grade, timelimit, status) VALUES ";
+			for (int i = 0; i <= (13 - 5 + 1); i++) {
+				insertOrUpdatePresets += "(" + i  + "," + presetLimits.get(i)  + "," + presetStates.get(i) + "),";
+			}
+			int affectedRows = stmt.executeUpdate(insertOrUpdatePresets.substring(0, insertOrUpdatePresets.length() -1));
+			
+			if (affectedRows == 20) {
+				TimeLimitMain.sendConsoleMessage("default", "Alle Limit-Presets erfolgreich aktualisiert");
 
 			} else {
-				TimeLimitMain.sendConsoleMessage("warning", "Fehlende Limit-Presets wurden hinzugefügt");
+				TimeLimitMain.sendConsoleMessage("warning", "INGORE IF FIRST TIME SETUP: Nicht alle Limit-Presets konnten eingefügt werden");
 			}
 
 			// Schliesst das Statement

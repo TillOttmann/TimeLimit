@@ -20,7 +20,7 @@ class CommandManager implements CommandExecutor, TabCompleter {
 	private Player player;
 	private Connection conn;
 	private String target;
-	private int timeLimit;
+	private int timelimit;
 	private boolean status;
 	private String subCommand;
 	
@@ -41,13 +41,13 @@ class CommandManager implements CommandExecutor, TabCompleter {
 		return false;
 	}
 	
-	// Überprüft das timeLimit
-	private boolean setTimeLimit(String timeLimit) {
+	// Überprüft das timelimit
+	private boolean setTimeLimit(String timelimit) {
 		try {
-			this.timeLimit = Integer.parseInt(timeLimit);
+			this.timelimit = Integer.parseInt(timelimit);
 			// 32767 ist das maximum von SMALLINT(6) (signed), Werte darüber
 			// führen zu einer SQLException
-			if (this.timeLimit >= 0 && this.timeLimit <= 32767) return true;
+			if (this.timelimit >= 0 && this.timelimit <= 32767) return true;
 		
 		// Ignoriert die NumberFormatException (wird geworfen wenn das Zeitlimit keine Zahl ist)
 		// Gibt jedoch eine Fehlermeldung wieder
@@ -101,7 +101,7 @@ class CommandManager implements CommandExecutor, TabCompleter {
 					if (player.hasPermission("timelimit.set")) {
 						Bukkit.getScheduler().runTaskAsynchronously(TimeLimitMain.getInstance(), () -> {
 							updateTimeLimitDB();
-							if (isPlayerOnline(target)) PlayerListener.restartPlayer(Bukkit.getServer().getPlayer(target));
+							if (isPlayerOnline(target)) PlayerListener.restartPlayerLoops(Bukkit.getServer().getPlayer(target), timelimit, null);
 						});
 					} else {
 						player.sendMessage("Dir fehlt die Berechtigung 'timelimit.set', um diesen Befehl auszuführen!");
@@ -127,7 +127,7 @@ class CommandManager implements CommandExecutor, TabCompleter {
 						status = (subCommand.equalsIgnoreCase("disable")) ? false : true;
 						Bukkit.getScheduler().runTaskAsynchronously(TimeLimitMain.getInstance(), () -> {
 							changeTimeLimitStatusDB();
-							if (isPlayerOnline(target)) PlayerListener.restartPlayer(Bukkit.getServer().getPlayer(target));
+							if (isPlayerOnline(target)) PlayerListener.restartPlayerLoops(Bukkit.getServer().getPlayer(target), null, status);
 						});
 					} else {
 						player.sendMessage("Dir fehlt die Berechtigung 'timelimit.status', um diesen Befehl auszuführen!");
@@ -156,7 +156,7 @@ class CommandManager implements CommandExecutor, TabCompleter {
 			String updateTimeLimit = "UPDATE playerData SET timelimit = ?, modified = 1 WHERE uuid = ?";
 			
 			preparedStmt = conn.prepareStatement(updateTimeLimit);
-			preparedStmt.setInt(1, timeLimit);
+			preparedStmt.setInt(1, timelimit);
 			preparedStmt.setString(2, PlayerUUIDFetcher.getUUID(target));
 			
 			int affectedRows = preparedStmt.executeUpdate();		
@@ -176,7 +176,7 @@ class CommandManager implements CommandExecutor, TabCompleter {
 					
 					preparedStmt = conn.prepareStatement(insertMissingPlayerData);
 					preparedStmt.setString(1, PlayerUUIDFetcher.getUUID(target));
-					preparedStmt.setInt(2, timeLimit);
+					preparedStmt.setInt(2, timelimit);
 					affectedRows = preparedStmt.executeUpdate();
 				}
 				
@@ -189,10 +189,10 @@ class CommandManager implements CommandExecutor, TabCompleter {
 				} else {
 					TimeLimitMain.sendConsoleMessage("default", 
 							"Zeitlimit für " + PlayerUUIDFetcher.getUUID(target) + " erfolgreich auf "
-							+ timeLimit + " Minuten gesetzt");
+							+ timelimit + " Minuten gesetzt");
 				
 					player.sendMessage("Zeitlimit für " + target + " erfolgreich auf "
-							+ timeLimit + " Minuten gesetzt");
+							+ timelimit + " Minuten gesetzt");
 				}
 			}
 		} catch (SQLException e) {
@@ -213,7 +213,7 @@ class CommandManager implements CommandExecutor, TabCompleter {
 			ResultSet result = preparedStmt.executeQuery();
 			
 			if (result.next()) {
-				int timeLimitTemp = result.getInt("timelimit");
+				int timelimitTemp = result.getInt("timelimit");
 				String statusString = (result.getBoolean("status")) ? "aktiviert" : "deaktiviert";
 				
 				if (!result.isLast()) {
@@ -223,7 +223,7 @@ class CommandManager implements CommandExecutor, TabCompleter {
 					
 				} else {
 					player.sendMessage("Das Zeitlimit von " + target 
-					+ " beträgt " + timeLimitTemp + " Minuten (" + statusString + ")");
+					+ " beträgt " + timelimitTemp + " Minuten (" + statusString + ")");
 				}
 			} else {
 				player.sendMessage("Das Zeitlimit von " + target + " wurde nicht gefunden");

@@ -1,3 +1,29 @@
 DB_Url: 'localhost:3306'
 DB_User: 'cooluser'
 DB_Pw: 'coolpassword'
+
+FIRST_WARNING_TIME: 5
+SECOND_WARNING_TIME: 1
+GRADE_0_LIMIT: 120
+GRADE_5_LIMIT: 120
+GRADE_6_LIMIT: 120
+GRADE_7_LIMIT: 120
+GRADE_8_LIMIT: 120
+GRADE_9_LIMIT: 120
+GRADE_10_LIMIT: 120
+GRADE_11_LIMIT: 120
+GRADE_12_LIMIT: 120
+GRADE_13_LIMIT: 120
+
+GRADE_0_STATE: FALSE
+GRADE_5_STATE: TRUE
+GRADE_6_STATE: TRUE
+GRADE_7_STATE: TRUE
+GRADE_8_STATE: TRUE
+GRADE_9_STATE: TRUE
+GRADE_10_STATE: TRUE
+GRADE_11_STATE: FALSE
+GRADE_12_STATE: FALSE
+GRADE_13_STATE: FALSE
+
+PERMISSION_GROUPS: ["group.6a", "group.6b", "group.6c", "group.6d", "group.7a", "group.7b", "group.7c", "group.7d", "group.8a", "group.8b", "group.8c", "group.8d", "group.9a", "group.9b", "group.9d", "group.9d", "group.10a", "group.10b", "group.10d"]

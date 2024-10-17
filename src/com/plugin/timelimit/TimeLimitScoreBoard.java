@@ -7,13 +7,10 @@ import net.md_5.bungee.api.ChatColor;
 class TimeLimitScoreBoard {
 	private FastBoard board;
 	private Player player;
-	private int playTime;
-	private int timeLimit;
 	private boolean status;
 	
 	protected TimeLimitScoreBoard(Player player) {
 		 this.player = player;
-		 timeLimit = PlayerListener.getTimeLimit(player);
 		 enableBoard();
 		 status = true;
 	}
@@ -59,12 +56,13 @@ class TimeLimitScoreBoard {
 	
 	// Aktualisiert das Scoreboard
 	private void updateScoreBoard() {
-		playTime = PlayerListener.getPlayTime(player);
+		int playTime = PlayerListener.getPlayTime(player);
+		int timelimit = PlayerListener.getTimeLimit(player);
 		board.updateLines(
 				"Heute: " + playTime + " Min",
 				"Übrig: "
-				+ (((timeLimit - playTime) <= 5) ? ChatColor.RED : "")
-				+ ((timeLimit >= 0) ? (timeLimit - playTime) : "∞" )
+				+ ((((timelimit - playTime) <= 5) && timelimit >= 0) ? ChatColor.RED : "")
+				+ ((timelimit >= 0) ? (timelimit - playTime) : "∞" )
 				+ " Min");
 	}
 }
