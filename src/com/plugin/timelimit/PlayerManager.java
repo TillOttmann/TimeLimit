@@ -69,11 +69,8 @@ class PlayerManager {
 	}
 	
 	void updateData(Integer timelimit, Boolean status) {
-		online = false;
 		if (timelimit != null && timelimit > 0) this.timelimit = timelimit;
 		if (status != null) this.status = status;
-		online = true;
-		timeLimitCheckerLoop();
 	}
 	
 	private void timeLimitCheckerLoop() {
