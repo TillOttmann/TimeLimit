@@ -56,7 +56,7 @@ class DatabaseConnection {
 		}
 		
 		try {
-			String DBUrl = "jdbc:mysql://" + config.getString("DB_Url") + "/" + config.getString("DB_Name") + "?autoReconnect=true";
+			String DBUrl = "jdbc:mysql://" + config.getString("DB_Url") + "/" + DBName + "?autoReconnect=true";
 			String DBUser = config.getString("DB_User");
 			String DBPw = config.getString("DB_Pw");
 			conn = DriverManager.getConnection(DBUrl, DBUser, DBPw);
