@@ -127,7 +127,7 @@ class PlayerManager {
 		try {
 			PreparedStatement preparedStmt;
 			
-			String getPlayTimeData = "SELECT playtime FROM playTimeData WHERE uuid = ?";
+			String getPlayTimeData = "SELECT playtime FROM playTimeData WHERE uuid = ? AND date = CURDATE()";
 			
 			preparedStmt = conn.prepareStatement(getPlayTimeData);
 			preparedStmt.setString(1, player.getUniqueId().toString());
