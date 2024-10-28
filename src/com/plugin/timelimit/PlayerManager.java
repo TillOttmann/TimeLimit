@@ -207,7 +207,7 @@ class PlayerManager {
 			String insertMissingData = "INSERT INTO playerData (uuid, grade, timelimit, status, modified)"
 					+ "VALUES (?, ?, "
 					+ "(SELECT timelimit FROM presetData WHERE grade = ?), "
-					+ "(SELECT status FROM presetData WHERE grade = ?), 1)";
+					+ "(SELECT status FROM presetData WHERE grade = ?), 0)";
 			
 			preparedStmt = conn.prepareStatement(insertMissingData);
 			preparedStmt.setString(1, uuid);
