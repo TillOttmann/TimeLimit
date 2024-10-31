@@ -143,15 +143,20 @@ class DatabaseConnection {
 			
 			// Fügt Zeitlimit-Presets in die Tabelle ein, falls diese nicht existieren
 			String insertOrUpdatePresets = "INSERT IGNORE presetData (grade, timelimit, status) VALUES ";
-			for (int i = 0; i <= (13 - 5 + 1); i++) {
-				insertOrUpdatePresets += "(" + i  + "," + presetLimits.get(i)  + "," + presetStates.get(i) + "),";
+			for (int i = 5; i <= 13; i++) {
+				insertOrUpdatePresets += "(" + i  + "," + presetLimits.get(i-4)  + "," + presetStates.get(i-4) + "),";
 			}
 			int affectedRows = stmt.executeUpdate(insertOrUpdatePresets.substring(0, insertOrUpdatePresets.length() -1));
 			
+			// Fügt Zeitlimit-Presets in die Tabelle ein, falls diese nicht existieren
+			insertOrUpdatePresets = "INSERT IGNORE presetData (grade, timelimit, status) VALUES (0, " 
+			+ presetLimits.get(0) + "," + presetStates.get(0) + ")";
+			affectedRows += stmt.executeUpdate(insertOrUpdatePresets);
+
 			if (affectedRows == 0) {
 				TimeLimitMain.sendConsoleMessage("default", "Alle Limit-Presets vorhanden");
 
-			} else if (affectedRows == 10) {
+			} else {
 				TimeLimitMain.sendConsoleMessage("warning", "Fehlende limit-presets wurden hinzugefügt");
 			}
 
