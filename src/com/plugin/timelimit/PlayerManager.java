@@ -171,6 +171,7 @@ class PlayerManager {
 					TimeLimitMain.sendConsoleMessage("error", "Mehr als ein Eintrag für '" + uuid + "' in playerData gefunden, bitte überprüfen!");
 					return false;	
 				}
+				return true;
 			}
 			insertMissingPlayerData();
 			return true;
