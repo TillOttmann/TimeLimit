@@ -1,4 +1,4 @@
-package com.plugin.timelimit;
+package de.goetheschuleessen.minecraft.timelimit;
 
 import java.io.BufferedReader;
 import java.io.IOException;

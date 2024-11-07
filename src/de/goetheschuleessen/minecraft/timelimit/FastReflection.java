@@ -21,7 +21,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package com.plugin.timelimit;
+package de.goetheschuleessen.minecraft.timelimit;
 
 import org.bukkit.Bukkit;
 

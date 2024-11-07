@@ -1,4 +1,4 @@
-package com.plugin.timelimit;
+package de.goetheschuleessen.minecraft.timelimit;
 
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;

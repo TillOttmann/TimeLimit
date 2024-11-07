@@ -1,4 +1,4 @@
-package com.plugin.timelimit;
+package de.goetheschuleessen.minecraft.timelimit;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -113,8 +113,10 @@ class PlayerManager {
 	// Findet die Stufe des Spielers mithilfe der PermissionGroup herraus
 	private int findGrade(Player player) {
 	    for (int i = 0; i < permissionGroups.size(); i++) {
+	    	player.sendMessage(permissionGroups.get(i));
 			if (player.hasPermission(permissionGroups.get(i))) {
-				return Integer.valueOf(permissionGroups.get(i).replaceAll("[^0-9]", ""));
+				player.sendMessage("true");
+				//return Integer.valueOf(permissionGroups.get(i).replaceAll("[^0-9]", ""));
 			}
 	    }
 	    if (player.hasPermission("group.EF")) return 11;
