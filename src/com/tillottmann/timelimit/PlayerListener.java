@@ -1,4 +1,4 @@
-package de.goetheschuleessen.minecraft.timelimit;
+package com.tillottmann.timelimit;
 
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;

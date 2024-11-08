@@ -1,4 +1,4 @@
-package de.goetheschuleessen.minecraft.timelimit;
+package com.tillottmann.timelimit;
 
 import java.io.File;
 import java.sql.Connection;

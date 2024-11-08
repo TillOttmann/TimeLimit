@@ -21,7 +21,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package de.goetheschuleessen.minecraft.timelimit;
+package com.tillottmann.timelimit;
 
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
