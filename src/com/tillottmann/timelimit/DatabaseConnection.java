@@ -93,63 +93,63 @@ class DatabaseConnection {
 			stmt.execute("USE " + DBName);
 			stmt.clearWarnings();
 
-			// Erstellt die presetData Tabelle, diese enthält das voreingestellte Zeitlimit
+			// Erstellt die presetdata Tabelle, diese enthält das voreingestellte Zeitlimit
 			// jeder Stufe
 			// Die Spalte 'status' gibt an, ob das limit aktiviert oder deaktiviert ist (1 =
 			// aktiv, 0 = nicht aktiv)
-			String createPresetDataTable = "CREATE TABLE IF NOT EXISTS presetData "
+			String createPresetDataTable = "CREATE TABLE IF NOT EXISTS presetdata "
 				+ "(grade TINYINT UNIQUE, timelimit SMALLINT DEFAULT 0, status BOOLEAN DEFAULT 0)";
 			stmt.executeUpdate(createPresetDataTable);
 
 			if (stmt.getWarnings() != null) {
-				TimeLimitMain.sendConsoleMessage("default", "Tabelle 'presetData' existiert bereits, Erstellung wird übersprungen");
+				TimeLimitMain.sendConsoleMessage("default", "Tabelle 'presetdata' existiert bereits, Erstellung wird übersprungen");
 
 			} else {
-				TimeLimitMain.sendConsoleMessage("warning", "Tabelle 'presetData' erfolgreich erstellt");
+				TimeLimitMain.sendConsoleMessage("warning", "Tabelle 'presetdata' erfolgreich erstellt");
 			}
 
 			stmt.clearWarnings();
 
-			// Erstellt die playTimeData Tabelle, hier wird die Spielzeit jedes Spielers in
+			// Erstellt die playtimedata Tabelle, hier wird die Spielzeit jedes Spielers in
 			// Abhängigkeit des Datums angegeben
-			String createPlayTimeDataTable = "CREATE TABLE IF NOT EXISTS playTimeData "
+			String createPlayTimeDataTable = "CREATE TABLE IF NOT EXISTS playtimedata "
 				+ "(id INT AUTO_INCREMENT PRIMARY KEY, date DATETIME, UUID VARCHAR(36), "
-				+ "playtime MEDIUMINT DEFAULT 0, UNIQUE KEY unique_uuid_date (uuid, date))";
+				+ "playtime MEDIUMINT DEFAULT 0, username VARCHAR(16), UNIQUE KEY unique_uuid_date (uuid, date))";
 			stmt.executeUpdate(createPlayTimeDataTable);
 
 			if (stmt.getWarnings() != null) {
-				TimeLimitMain.sendConsoleMessage("default", "Tabelle 'playTimeData' existiert bereits, Erstellung wird übersprungen");
+				TimeLimitMain.sendConsoleMessage("default", "Tabelle 'playtimedata' existiert bereits, Erstellung wird übersprungen");
 
 			} else {
-				TimeLimitMain.sendConsoleMessage("warning", "Tabelle 'playTimeData' erfolgreich erstellt");
+				TimeLimitMain.sendConsoleMessage("warning", "Tabelle 'playtimedata' erfolgreich erstellt");
 			}
 
 			stmt.clearWarnings();
 
-			// Erstellt die playerData Tabelle, in dieser werden die Stufe, das individuelle
+			// Erstellt die playerdata Tabelle, in dieser werden die Stufe, das individuelle
 			// Zeitlimit und der Status angegeben
 			// Die Spalte 'modified' speichert ausserdem, ob der Spieler ein individuelles
 			// Zeitlimit erhalten hat
-			String createPlayerDataTable = "CREATE TABLE IF NOT EXISTS playerData "
-				+ "(uuid VARCHAR(36) PRIMARY KEY, grade TINYINT, timelimit SMALLINT DEFAULT 0, status BOOLEAN DEFAULT 0, modified BOOLEAN DEFAULT 0)";
+			String createPlayerDataTable = "CREATE TABLE IF NOT EXISTS playerdata "
+				+ "(uuid VARCHAR(36) PRIMARY KEY, username VARCHAR(16), grade TINYINT, timelimit SMALLINT DEFAULT 0, status BOOLEAN DEFAULT 0, modified BOOLEAN DEFAULT 0)";
 			stmt.executeUpdate(createPlayerDataTable);
 
 			if (stmt.getWarnings() != null) {
-				TimeLimitMain.sendConsoleMessage("default", "Tabelle 'playerData' existiert bereits, Erstellung wird übersprungen");
+				TimeLimitMain.sendConsoleMessage("default", "Tabelle 'playerdata' existiert bereits, Erstellung wird übersprungen");
 
 			} else {
-				TimeLimitMain.sendConsoleMessage("warning", "Tabelle 'playerData' erfolgreich erstellt");
+				TimeLimitMain.sendConsoleMessage("warning", "Tabelle 'playerdata' erfolgreich erstellt");
 			}
 			
 			// Fügt Zeitlimit-Presets in die Tabelle ein, falls diese nicht existieren
-			String insertOrUpdatePresets = "INSERT IGNORE presetData (grade, timelimit, status) VALUES ";
+			String insertOrUpdatePresets = "INSERT IGNORE presetdata (grade, timelimit, status) VALUES ";
 			for (int i = 5; i <= 13; i++) {
 				insertOrUpdatePresets += "(" + i  + "," + presetLimits.get(i-4)  + "," + presetStates.get(i-4) + "),";
 			}
 			int affectedRows = stmt.executeUpdate(insertOrUpdatePresets.substring(0, insertOrUpdatePresets.length() -1));
 			
 			// Fügt Zeitlimit-Presets in die Tabelle ein, falls diese nicht existieren
-			insertOrUpdatePresets = "INSERT IGNORE presetData (grade, timelimit, status) VALUES (0, " 
+			insertOrUpdatePresets = "INSERT IGNORE presetdata (grade, timelimit, status) VALUES (0, " 
 			+ presetLimits.get(0) + "," + presetStates.get(0) + ")";
 			affectedRows += stmt.executeUpdate(insertOrUpdatePresets);
 
@@ -157,7 +157,7 @@ class DatabaseConnection {
 				TimeLimitMain.sendConsoleMessage("default", "Alle Limit-Presets vorhanden");
 
 			} else {
-				TimeLimitMain.sendConsoleMessage("warning", "Fehlende limit-presets wurden hinzugefügt");
+				TimeLimitMain.sendConsoleMessage("warning", "Fehlende Limit-Presets wurden hinzugefügt");
 			}
 
 			// Schliesst das Statement

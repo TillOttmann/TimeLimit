@@ -153,7 +153,7 @@ class CommandManager implements CommandExecutor, TabCompleter {
 		try {
 			PreparedStatement preparedStmt;
 			
-			String updateTimeLimit = "UPDATE playerData SET timelimit = ?, modified = 1 WHERE uuid = ?";
+			String updateTimeLimit = "UPDATE playerdata SET timelimit = ?, modified = 1 WHERE uuid = ?";
 			
 			preparedStmt = conn.prepareStatement(updateTimeLimit);
 			preparedStmt.setInt(1, timelimit);
@@ -162,33 +162,34 @@ class CommandManager implements CommandExecutor, TabCompleter {
 			int affectedRows = preparedStmt.executeUpdate();		
 
 			if (affectedRows > 1) {
-				TimeLimitMain.sendConsoleMessage("error", "Mehr als ein Eintrag in 'playerData' für '"
-						+ PlayerUUIDFetcher.getUUID(target) + "' gefunden, bitte überprüfen!");
+				TimeLimitMain.sendConsoleMessage("error", "Mehr als ein Eintrag in 'playerdata' für '"
+						+ target + "(" + PlayerUUIDFetcher.getUUID(target) + ")' gefunden, bitte überprüfen!");
 				player.sendMessage("Error, bitte Console überprüfen!");
 				
 			} else {
 
 				if (affectedRows == 0) {
 
-					String insertMissingPlayerData = "INSERT INTO playerData "
-							+ "(uuid, grade, timelimit, status, modified) "
-							+ "VALUES (?, 0, ?, 1, 1)";
+					String insertMissingPlayerData = "INSERT INTO playerdata "
+							+ "(uuid, grade, timelimit, status, modified, username) "
+							+ "VALUES (?, 0, ?, 1, 1, ?)";
 					
 					preparedStmt = conn.prepareStatement(insertMissingPlayerData);
 					preparedStmt.setString(1, PlayerUUIDFetcher.getUUID(target));
 					preparedStmt.setInt(2, timelimit);
+					preparedStmt.setString(3, target);
 					affectedRows = preparedStmt.executeUpdate();
 				}
 				
 				if (affectedRows != 1) {
 					TimeLimitMain.sendConsoleMessage("warning", 
-							"Eintrag für '" + PlayerUUIDFetcher.getUUID(target) + "' konnte nicht erstellt werden");
+							"Eintrag für '" + target + "(" + PlayerUUIDFetcher.getUUID(target) + ")' konnte nicht erstellt werden");
 					
 					player.sendMessage("Eintrag für '" + target + "' konnte nicht erstellt werden");
 					
 				} else {
 					TimeLimitMain.sendConsoleMessage("default", 
-							"Zeitlimit für " + PlayerUUIDFetcher.getUUID(target) + " erfolgreich auf "
+							"Zeitlimit für '" + target + "(" + PlayerUUIDFetcher.getUUID(target) + ")' erfolgreich auf "
 							+ timelimit + " Minuten gesetzt");
 				
 					player.sendMessage("Zeitlimit für " + target + " erfolgreich auf "
@@ -205,7 +206,7 @@ class CommandManager implements CommandExecutor, TabCompleter {
 		try {
 			PreparedStatement preparedStmt;
 			
-			String getTimeLimit = "SELECT timelimit, status FROM playerData WHERE uuid = ?";
+			String getTimeLimit = "SELECT timelimit, status FROM playerdata WHERE uuid = ?";
 			
 			preparedStmt = conn.prepareStatement(getTimeLimit);
 			preparedStmt.setString(1, PlayerUUIDFetcher.getUUID(target));
@@ -218,7 +219,7 @@ class CommandManager implements CommandExecutor, TabCompleter {
 				
 				if (!result.isLast()) {
 					TimeLimitMain.sendConsoleMessage("error", "Mehr als ein Eintrag für '" 
-							+ PlayerUUIDFetcher.getUUID(target) + "' in playerData gefunden, bitte überprüfen!");
+							+ target + "(" + PlayerUUIDFetcher.getUUID(target) + ")' in playerdata gefunden, bitte überprüfen!");
 					player.sendMessage("Error, bitte Console überprüfen!");
 					
 				} else {
@@ -238,7 +239,7 @@ class CommandManager implements CommandExecutor, TabCompleter {
 		try {
 			PreparedStatement preparedStmt;
 			
-			String changeStatus = "UPDATE playerData SET status = ?, modified = 1 WHERE uuid = ?";
+			String changeStatus = "UPDATE playerdata SET status = ?, modified = 1 WHERE uuid = ?";
 			
 			preparedStmt = conn.prepareStatement(changeStatus);
 			preparedStmt.setBoolean(1, status);
@@ -247,34 +248,35 @@ class CommandManager implements CommandExecutor, TabCompleter {
 			int affectedRows = preparedStmt.executeUpdate();		
 
 			if (affectedRows > 1) {
-				TimeLimitMain.sendConsoleMessage("error", "Mehr als ein Eintrag in 'playerData' für '"
-						+ PlayerUUIDFetcher.getUUID(target) + "' gefunden, bitte überprüfen!");
+				TimeLimitMain.sendConsoleMessage("error", "Mehr als ein Eintrag in 'playerdata' für '"
+						+ target + "(" + PlayerUUIDFetcher.getUUID(target) + ")' gefunden, bitte überprüfen!");
 				player.sendMessage("Error, bitte Console überprüfen!");
 				
 			} else {
 				if (affectedRows == 0) {
 
-					String insertMissingPlayerData = "INSERT INTO playerData "
-							+ "(uuid, grade, timelimit, status, modified) "
-							+ "VALUES (?, 0, 0, ?, 1)";
+					String insertMissingPlayerData = "INSERT INTO playerdata "
+							+ "(uuid, grade, timelimit, status, modified, username) "
+							+ "VALUES (?, 0, 0, ?, 1, ?)";
 					
 					preparedStmt = conn.prepareStatement(insertMissingPlayerData);
 					preparedStmt.setString(1, PlayerUUIDFetcher.getUUID(target));
 					preparedStmt.setBoolean(2, status);
+					preparedStmt.setString(3, target);
 					affectedRows = preparedStmt.executeUpdate();
 				}
 				
 				if (affectedRows != 1) {
 					TimeLimitMain.sendConsoleMessage("warning", 
-							"Eintrag für '" + PlayerUUIDFetcher.getUUID(target) + "' konnte nicht erstellt werden");
+							"Eintrag für '" + target + "(" +  PlayerUUIDFetcher.getUUID(target) + ")' konnte nicht erstellt werden");
 					
-					player.sendMessage("Eintrag für '" + target + "' konnte nicht erstellt werden");
+					player.sendMessage("Eintrag für " + target + " konnte nicht erstellt werden");
 				}
 				
 				String action = (status) ? "aktiviert" : "deaktiviert";
 				
 				TimeLimitMain.sendConsoleMessage("default", 
-						"Zeitlimit für " + PlayerUUIDFetcher.getUUID(target) + " erfolgreich " + action);
+						"Zeitlimit für '" + target + "(" + PlayerUUIDFetcher.getUUID(target) + ")' erfolgreich " + action);
 			
 				player.sendMessage("Zeitlimit für " + target + " erfolgreich " + action);
 			
