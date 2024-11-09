@@ -41,7 +41,6 @@ class PlayerListener implements Listener {
 	// es wird nicht nur versteckt, wie der Befehl 'hide/show' zu vermuten lässt
 	static void changeScoreBoardStatus(Player player, boolean status) {
 		playerBoards.get(player.getName()).changeSBStatus(status);
-		
 	}
 	
 	// Spielzeit-Getter, wird durch updateScoreboard() in TimeLimitScoreBoard aufgerufen
